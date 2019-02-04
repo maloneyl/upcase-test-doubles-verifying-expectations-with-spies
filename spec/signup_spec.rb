@@ -4,28 +4,40 @@ require "signup"
 describe Signup do
   describe "#save" do
     it "creates an account with one user" do
-      signup = Signup.new(email: "user@example.com", account_name: "Example")
+      # Setup
+      attributes = {email: "user@example.com", account_name: "Example"}
+      account = double("account")
+      allow(Account).to receive(:create!).and_return(account)
+      user = double("user")
+      allow(User).to receive(:create!).and_return(user)
+      signup = Signup.new(attributes)
 
+      # Exercise
       result = signup.save
 
-      expect(Account.count).to eq(1)
-      expect(Account.last.name).to eq("Example")
-      expect(User.count).to eq(1)
-      expect(User.last.email).to eq("user@example.com")
-      expect(User.last.account).to eq(Account.last)
+      # Verification
+      expect(Account).to have_received(:create!).with(name: attributes[:account_name])
+      expect(User).to have_received(:create!).with(account: account, email: attributes[:email])
       expect(result).to be(true)
     end
   end
 
   describe "#user" do
     it "returns the user created by #save" do
-      signup = Signup.new(email: "user@example.com", account_name: "Example")
+      # Setup
+      attributes = {email: "user@example.com", account_name: "Example"}
+      account = double("account")
+      allow(Account).to receive(:create!).and_return(account)
+      user = double("user")
+      allow(User).to receive(:create!).and_return(user)
+      signup = Signup.new(attributes)
       signup.save
 
+      # Exercise
       result = signup.user
 
-      expect(result.email).to eq("user@example.com")
-      expect(result.account.name).to eq("Example")
+      # Verification
+      expect(result).to eq(user)
     end
   end
 end
