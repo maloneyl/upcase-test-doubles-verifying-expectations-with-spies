@@ -5,11 +5,9 @@ describe Signup do
   describe "#save" do
     it "creates an account with one user" do
       # Setup
+      account = stub_instance(Account)
+      stub_instance(User)
       attributes = {email: "user@example.com", account_name: "Example"}
-      account = double("account")
-      allow(Account).to receive(:create!).and_return(account)
-      user = double("user")
-      allow(User).to receive(:create!).and_return(user)
       signup = Signup.new(attributes)
 
       # Exercise
@@ -25,12 +23,9 @@ describe Signup do
   describe "#user" do
     it "returns the user created by #save" do
       # Setup
-      attributes = {email: "user@example.com", account_name: "Example"}
-      account = double("account")
-      allow(Account).to receive(:create!).and_return(account)
-      user = double("user")
-      allow(User).to receive(:create!).and_return(user)
-      signup = Signup.new(attributes)
+      stub_instance(Account)
+      user = stub_instance(User)
+      signup = Signup.new({email: "user@example.com", account_name: "Example"})
       signup.save
 
       # Exercise
@@ -38,6 +33,12 @@ describe Signup do
 
       # Verification
       expect(result).to eq(user)
+    end
+  end
+
+  def stub_instance(model)
+    double(model.name).tap do |instance|
+      allow(model).to receive(:create!).and_return(instance)
     end
   end
 end
